@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>AI Money Assistant</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    body { padding: 10px; }
+    .card { padding: 15px; border-radius: 12px; background: #111827; color: white; margin-bottom: 10px; }
+    button { width: 100%; margin-top: 8px; }
+    .row { display: grid; gap: 10px; }
+    input { margin-bottom: 8px; }
+    .small { font-size: 13px; opacity: 0.8; }
+  </style>
+</head>
+
+<body>
+
+<nav class="container-fluid">
+  <ul><li><strong>💰 AI Money Assistant</strong></li></ul>
+  <ul>
+    <li><a href="#" onclick="showTab('home')">Главная</a></li>
+    <li><a href="#" onclick="showTab('earn')">Заработок</a></li>
+    <li><a href="#" role="button" onclick="showTab('finance')">Финансы</a></li>
+  </ul>
+</nav>
+
+<main class="container">
+
+  <!-- HOME -->
+  <section id="home">
+    <div class="card">
+      <h3>Привет 👋</h3>
+      <p id="user"></p>
+      <p class="small">AI помогает тебе зарабатывать, экономить и управлять задачами каждый день.</p>
+    </div>
+
+    <div class="card">
+      <h4>📊 Daily AI Совет</h4>
+      <p id="tip">Нажми кнопку ниже</p>
+      <button onclick="dailyTip()">Получить совет</button>
+    </div>
+
+    <div class="card">
+      <h4>⚡ Быстрое действие</h4>
+      <button onclick="sendToTelegram()">Отправить данные в Telegram</button>
+    </div>
+  </section>
+
+  <!-- EARN -->
+  <section id="earn" style="display:none;">
+    <div class="card">
+      <h3>💸 Идеи заработка</h3>
+      <button onclick="earnIdea()">Получить идею</button>
+      <p id="idea"></p>
+    </div>
+  </section>
+
+  <!-- FINANCE -->
+  <section id="finance" style="display:none;">
+    <div class="card">
+      <h3>💰 Учёт расходов</h3>
+
+      <input id="expenseName" placeholder="Что купил?" />
+      <input id="expenseAmount" placeholder="Сколько?" type="number" />
+
+      <button onclick="addExpense()">Добавить</button>
+
+      <h4>История</h4>
+      <div id="list"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+// user info
+document.getElementById("user").innerText =
+  "Пользователь: " + (tg.initDataUnsafe?.user?.first_name || "гость");
+
+// navigation
+function showTab(tab) {
+  document.querySelectorAll("main section").forEach(s => s.style.display = "none");
+  document.getElementById(tab).style.display = "block";
+}
+
+// AI tips (mock logic)
+const tips = [
+  "Сохраняй 10% дохода каждый день — это создаёт капитал.",
+  "Микро-навыки (AI, дизайн, код) быстрее всего монетизируются.",
+  "Ограничь импульсные покупки — они съедают до 40% бюджета.",
+  "Сделай один маленький доходный навык и прокачай его 30 дней."
+];
+
+function dailyTip() {
+  document.getElementById("tip").innerText =
+    tips[Math.floor(Math.random() * tips.length)];
+}
+
+// earnings ideas
+const ideas = [
+  "Фриланс: делай простые логотипы через AI",
+  "Telegram-канал с подборками товаров + партнёрки",
+  "Создание mini apps под бизнесы",
+  "Перепродажа цифровых услуг",
+  "AI-консультации для малого бизнеса"
+];
+
+function earnIdea() {
+  document.getElementById("idea").innerText =
+    ideas[Math.floor(Math.random() * ideas.length)];
+}
+
+// expenses
+let expenses = JSON.parse(localStorage.getItem("exp") || "[]");
+
+function addExpense() {
+  const name = document.getElementById("expenseName").value;
+  const amount = document.getElementById("expenseAmount").value;
+
+  if (!name || !amount) return;
+
+  expenses.push({ name, amount });
+  localStorage.setItem("exp", JSON.stringify(expenses));
+
+  render();
+}
+
+function render() {
+  document.getElementById("list").innerHTML =
+    expenses.map(e => `<p>• ${e.name} — ${e.amount}₽</p>`).join("");
+}
+
+render();
+
+// send to Telegram
+function sendToTelegram() {
+  tg.sendData(JSON.stringify({
+    expenses,
+    message: "User data sent from Mini App"
+  }));
+  tg.close();
+}
+</script>
+
+</body>
+</html>
