@@ -1,0 +1,2 @@
+# AMA
+⚙️ 💰 AI MONEY ASSISTANT — TELEGRAM MINI APP
